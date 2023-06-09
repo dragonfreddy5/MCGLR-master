@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 500.0f;
     public bool canMove = true;
 
-    float timesJumped;
+    int timesJumped;
 
     private Rigidbody rigidBody;
     private Animator animator;
@@ -62,46 +62,32 @@ public class PlayerController : MonoBehaviour
             // Apply the movement vector to the rigidbody
             rigidBody.velocity = new Vector3(movementVector.x, rigidBody.velocity.y, movementVector.z);
 
+            if(IsGrounded())
+            {
+                timesJumped = 0;
+            }
+            
+
             // Set the animator parameters
             // animator.SetFloat("Horizontal", horizontalAxis);
             // animator.SetFloat("Vertical", verticalAxis);
             // animator.SetBool("IsGrounded", IsGrounded());
 
-            if(IsGrounded())
-            {
-                timesJumped = 0;
-            }
-
             // Check if the jump button is pressed
-            if (Input.GetButtonDown("Jump"))
+            if (Input.GetButtonDown("Jump") && timesJumped != 2)
             {
                 timesJumped++;
-
-                if(timesJumped < 3)
-                {
-                    Jump(movementVector, timesJumped+0.2f);
-                }
-
-                
+                // Apply the jump force to the rigidbody
+                rigidBody.AddForce(new Vector3(movementVector.x, jumpForce + rigidBody.velocity.y, movementVector.z));
+                GameManager.Instance.PlayVE(1);
             }
         }
-    }
-
-    void Jump(Vector3 movementVector, float divider)
-    {
-        if(divider == 0)
-        {
-            divider = 1;
-        }
-        // Apply the jump force to the rigidbody
-        rigidBody.AddForce(new Vector3(movementVector.x, (jumpForce/divider) + rigidBody.velocity.y, movementVector.z));
-        GameManager.Instance.PlayVE(1);
     }
 
     bool IsGrounded()
     {
         // Check if the player is grounded
-        return Physics.Raycast(transform.position, Vector3.down, 1.0f);
+        return Physics.Raycast(transform.position, Vector3.down, 4.0f);
     }
 }
 
