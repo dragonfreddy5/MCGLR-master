@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public AudioClip Winner;
     public AudioSource VE;
     public AudioClip[] VEClip;
+    public RectTransform winText;
 
     public static GameManager Instance { get; private set; }
     private void Awake() 
@@ -50,6 +51,12 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public IEnumerator GoToTitle()
+    {
+        yield return StartCoroutine(FadeToColor(1));
+        SceneManager.LoadScene("mcglr");
+    }
+
     public IEnumerator Win()
     {
         PlayerController.Instance.canMove = false;
@@ -59,6 +66,22 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(FadeToColor(2));
         yield return StartCoroutine(FadeToColor(0));
+        yield return StartCoroutine(WinReturnToStart());
+    }
+
+    IEnumerator WinReturnToStart()
+    {
+        winText.DOScale(new Vector3(1, 1), 0.2f);
+
+        while(true)
+        {
+            if (Input.anyKey)
+            {
+                yield return StartCoroutine(GameManager.Instance.GoToTitle());
+            }
+            yield return null;
+        }
+        yield return null;
     }
 
     public IEnumerator Respawn()
