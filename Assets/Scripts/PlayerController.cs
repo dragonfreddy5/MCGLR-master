@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 500.0f;
     public bool canMove = true;
 
+    float timesJumped;
+
     private Rigidbody rigidBody;
     private Animator animator;
     private Camera mainCamera;
@@ -65,14 +67,35 @@ public class PlayerController : MonoBehaviour
             // animator.SetFloat("Vertical", verticalAxis);
             // animator.SetBool("IsGrounded", IsGrounded());
 
-            // Check if the jump button is pressed
-            if (Input.GetButtonDown("Jump") && IsGrounded())
+            if(IsGrounded())
             {
-                // Apply the jump force to the rigidbody
-                rigidBody.AddForce(new Vector3(movementVector.x, jumpForce + rigidBody.velocity.y, movementVector.z));
-                GameManager.Instance.PlayVE(1);
+                timesJumped = 0;
+            }
+
+            // Check if the jump button is pressed
+            if (Input.GetButtonDown("Jump"))
+            {
+                timesJumped++;
+
+                if(timesJumped < 3)
+                {
+                    Jump(movementVector, timesJumped+0.2f);
+                }
+
+                
             }
         }
+    }
+
+    void Jump(Vector3 movementVector, float divider)
+    {
+        if(divider == 0)
+        {
+            divider = 1;
+        }
+        // Apply the jump force to the rigidbody
+        rigidBody.AddForce(new Vector3(movementVector.x, (jumpForce/divider) + rigidBody.velocity.y, movementVector.z));
+        GameManager.Instance.PlayVE(1);
     }
 
     bool IsGrounded()
